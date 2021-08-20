@@ -8,7 +8,13 @@ public class Collectable : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            other.GetComponent<Player>().Collectable();
+            Player player = other.GetComponent<Player>();
+            if (player != null)
+            {
+                player.Collectable();
+            }
+            else { Debug.LogError("Collectable.player is null"); }
+
             Destroy(this.gameObject);
         }
     }
