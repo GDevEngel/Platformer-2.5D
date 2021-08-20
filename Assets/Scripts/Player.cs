@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -17,12 +18,15 @@ public class Player : MonoBehaviour
     private bool _doubleJumped;
 
     private int _collectables;
+    private int _lives = 3;
 
     // Start is called before the first frame update
     void Start()
     {
         _controller = GetComponent<CharacterController>();
-        if (_controller == null) { Debug.LogError("player.charactercontroller is null"); }        
+        if (_controller == null) { Debug.LogError("player.charactercontroller is null"); }
+
+        _uIManager.UpdateLivesText(_lives);
     }
 
     // Update is called once per frame
@@ -57,9 +61,35 @@ public class Player : MonoBehaviour
         _controller.Move(velocity * Time.deltaTime);
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "DeathZone")
+        {
+            Death();
+        }
+    }
+
     public void Collectable()
     {
         _collectables++;
         _uIManager.UpdateCollectableText(_collectables);
+    }
+
+    public void Death()
+    {
+        _lives--;
+        _uIManager.UpdateLivesText(_lives);
+        if (_lives <= 0)
+        {
+            //restart game
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        else
+        {
+            Debug.Log("respawn at "+ GameObject.FindGameObjectWithTag("Respawn").transform.position);
+            _controller.enabled = false;
+            transform.position = GameObject.FindGameObjectWithTag("Respawn").transform.position;
+            _controller.enabled = true;
+        }
     }
 }

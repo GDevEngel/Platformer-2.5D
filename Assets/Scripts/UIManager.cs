@@ -21,9 +21,15 @@ public class UIManager : MonoBehaviour
     }
 
     [SerializeField] private Text _collectableText;
+    [SerializeField] private Text _livesText;
 
     public void UpdateCollectableText(int collectableCount)
     {
         _collectableText.text = "Balls: " + collectableCount;
+    }
+
+    public void UpdateLivesText(int livesCount)
+    {
+        _livesText.text = "Lives: " + livesCount;
     }
 }
