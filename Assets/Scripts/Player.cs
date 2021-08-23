@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     private float _gravity = 0.5f;
     private float _jumpHeight = 25f;
     private float _speedWallJump = 10f;
+    private float _pushPower = 2.5f;
 
     //global var
     private float _yVelocity;
@@ -81,6 +82,26 @@ public class Player : MonoBehaviour
             Debug.DrawRay(hit.point, hit.normal, Color.blue, 1f, false);
             _canWallJump = true;
             _wallJumpDirection = hit.normal;
+        }
+
+        if (hit.gameObject.tag == "Pushable")
+        {
+            Rigidbody rigidBody = hit.collider.attachedRigidbody;
+
+            //no rigidbody on hit object
+            if (rigidBody == null || rigidBody.isKinematic)
+            {
+                return;
+            }
+            if (hit.moveDirection.y < -0.3)
+            {
+                return;
+            }
+
+            //calculate push direction from move direction, only push to the side
+            Vector3 pushDirection = new Vector3(hit.moveDirection.x, 0, 0);
+
+            rigidBody.velocity = pushDirection * _pushPower;
         }
     }
 
