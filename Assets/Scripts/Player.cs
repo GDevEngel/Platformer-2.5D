@@ -7,7 +7,6 @@ public class Player : MonoBehaviour
 {
     //handle
     private CharacterController _controller;
-    [SerializeField] private UIManager _uIManager;
 
     //config
     private float _speed = 5f;
@@ -26,7 +25,7 @@ public class Player : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         if (_controller == null) { Debug.LogError("player.charactercontroller is null"); }
 
-        _uIManager.UpdateLivesText(_lives);
+        UIManager.Instance.UpdateLivesText(_lives);
     }
 
     // Update is called once per frame
@@ -72,13 +71,13 @@ public class Player : MonoBehaviour
     public void Collectable()
     {
         _collectables++;
-        _uIManager.UpdateCollectableText(_collectables);
+        UIManager.Instance.UpdateCollectableText(_collectables);
     }
 
     public void Death()
     {
         _lives--;
-        _uIManager.UpdateLivesText(_lives);
+        UIManager.Instance.UpdateLivesText(_lives);
         if (_lives <= 0)
         {
             //restart game
@@ -91,5 +90,10 @@ public class Player : MonoBehaviour
             transform.position = GameObject.FindGameObjectWithTag("Respawn").transform.position;
             _controller.enabled = true;
         }
+    }
+
+    public int CollectableCollected()
+    {
+        return _collectables;
     }
 }
