@@ -12,9 +12,15 @@ public class Player : MonoBehaviour
     private float _speed = 5f;
     private float _gravity = 0.5f;
     private float _jumpHeight = 25f;
+    private float _speedWallJump = 10f;
 
+    //global var
     private float _yVelocity;
     private bool _doubleJumped;
+    private bool _canWallJump;
+    private Vector3 _wallJumpDirection;
+    private Vector3 _velocity;
+    private Vector3 _direction;
 
     private int _collectables;
     private int _lives = 3;
@@ -31,12 +37,12 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //get horizontal input = direction
-        Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0);
-        //velocity = direction with speed
-        Vector3 velocity = direction * _speed;
         if (_controller.isGrounded == true)
         {
+            //get horizontal input = direction
+            _direction = new Vector3(Input.GetAxis("Horizontal"), 0);
+            //velocity = direction with speed
+            _velocity = _direction * _speed;
             _doubleJumped = false;
             //jump
             if (Input.GetKeyDown(KeyCode.Space))
@@ -46,8 +52,15 @@ public class Player : MonoBehaviour
         }
         else
         {
+            if (Input.GetKeyDown(KeyCode.Space) && _canWallJump ==true)
+            {
+                Debug.Log("wall jump");
+                _yVelocity += _jumpHeight;
+                _velocity = _wallJumpDirection * _speedWallJump;
+                _canWallJump = false;
+            }
             //check for double jump
-            if (Input.GetKeyDown(KeyCode.Space) && _doubleJumped == false)
+            else if (Input.GetKeyDown(KeyCode.Space) && _doubleJumped == false)
             {
                 _yVelocity += _jumpHeight;
                 _doubleJumped = true;
@@ -55,9 +68,20 @@ public class Player : MonoBehaviour
             _yVelocity -= _gravity;
         }
 
-        velocity.y = _yVelocity;
+        _velocity.y = _yVelocity;
         //move player with velocity
-        _controller.Move(velocity * Time.deltaTime);
+        _controller.Move(_velocity * Time.deltaTime);
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Debug.Log("controller hit:" + hit.gameObject.name);
+        if (_controller.isGrounded == false && (hit.gameObject.tag == "Wall") == true)
+        {
+            Debug.DrawRay(hit.point, hit.normal, Color.blue, 1f, false);
+            _canWallJump = true;
+            _wallJumpDirection = hit.normal;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
